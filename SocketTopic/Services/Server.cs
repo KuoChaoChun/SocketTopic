@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace SocketTopic.Services
 {
@@ -14,6 +16,7 @@ namespace SocketTopic.Services
     {
         private Socket serverSocket;
         private bool isRunning;
+        string baseDirectory = "C:\\Users\\user\\OneDrive\\文件\\學習\\Visual Studio Project\\SocketTopic\\ServerForm\\Files";
 
         public Server()
         {
@@ -74,13 +77,15 @@ namespace SocketTopic.Services
             {
                 byte[] buffer = new byte[1024];
                 int receivedBytes = client.Receive(buffer);
-                string receivedData = Encoding.UTF8.GetString(buffer, 0, receivedBytes).Trim();
+                string fileName = Encoding.UTF8.GetString(buffer, 0, receivedBytes).Trim();
+                string filePath = Path.Combine(baseDirectory, fileName);
 
-                bool fileExists = CheckFileExists(receivedData);
-
-                string response = fileExists ? $"文件 '{receivedData}' 存在。" : $"文件 '{receivedData}' 不存在。";
-                byte[] responseData = Encoding.UTF8.GetBytes(response);
-                client.Send(responseData);
+                //bool fileExists = File.Exists(filePath);
+                if (File.Exists(filePath)) 
+                {
+                    byte[] fileBytes = File.ReadAllBytes(filePath);
+                    client.Send(fileBytes);
+                }            
 
                 client.Shutdown(SocketShutdown.Both);
                 client.Close();
@@ -91,17 +96,6 @@ namespace SocketTopic.Services
             }
         }
 
-        private bool CheckFileExists(string fileName)
-        {
-            switch (fileName)
-            {
-                case "file1.txt":
-                    return true;
-                case "file2.txt":
-                    return false;
-                default:
-                    return false;
-            }
-        }
+
     }
 }

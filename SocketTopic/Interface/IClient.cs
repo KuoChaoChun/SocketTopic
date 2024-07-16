@@ -14,7 +14,9 @@ namespace SocketTopic.Interface
         void Connect(string serverIP, int serverPort);
         void Disconnect();
         void Send(string message);
+        string ReceiveFile(byte[] fileContent, string savePath, string fileName);
         IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state);
         int EndReceive(IAsyncResult asyncResult);
+
     }
 }
