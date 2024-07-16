@@ -27,12 +27,13 @@ namespace SocketTopic.Services
             {
                 try
                 {
-                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8080);
+                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8081);
                     serverSocket.Bind(endPoint);
                     serverSocket.Listen(10);
 
                     isRunning = true;
                     ListenForClients();
+
                 }
                 catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
                 {
@@ -42,7 +43,7 @@ namespace SocketTopic.Services
                 {
                     Console.WriteLine("服务器启动错误: " + ex.Message);
                 }
-            });            
+            });
         }
 
         public void Stop()
@@ -51,6 +52,8 @@ namespace SocketTopic.Services
             serverSocket.Close();
         }
 
+        public Action<string, int, string> AfterConnect { get; set; }
+
         private void ListenForClients()
         {
             while (isRunning)
@@ -58,6 +61,8 @@ namespace SocketTopic.Services
                 Socket client = serverSocket.Accept();
                 IPEndPoint clientEndPoint = (IPEndPoint)client.RemoteEndPoint;
                 Console.WriteLine($"客户端已连接，IP: {clientEndPoint.Address}, 端口: {clientEndPoint.Port}");
+
+                AfterConnect?.Invoke(clientEndPoint.Address.ToString(), clientEndPoint.Port, string.Empty); //觸發事件
 
                 Task.Run(() => HandleClient(client));
             }
@@ -88,7 +93,6 @@ namespace SocketTopic.Services
 
         private bool CheckFileExists(string fileName)
         {
-            // 模拟文件存在与否的逻辑，这里简单地返回 true 或 false
             switch (fileName)
             {
                 case "file1.txt":

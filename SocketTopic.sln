@@ -5,9 +5,9 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketTopic", "SocketTopic\SocketTopic.csproj", "{56A1DB42-640B-41FE-9881-78A35C82B07B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientForm", "..\SocketTopic88\ClientForm\ClientForm.csproj", "{2F416191-5A11-4E19-9AA4-9D98260D20D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientForm", "ClientForm\ClientForm.csproj", "{2F416191-5A11-4E19-9AA4-9D98260D20D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerForm", "..\SocketTopic88\ServerForm\ServerForm.csproj", "{160AC40D-1AA1-4098-81A3-675511DB1521}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerForm", "ServerForm\ServerForm.csproj", "{160AC40D-1AA1-4098-81A3-675511DB1521}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

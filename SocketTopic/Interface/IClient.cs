@@ -9,6 +9,8 @@ namespace SocketTopic.Interface
 {
     public interface IClient
     {
+        bool IsConnected { get; }
+
         void Connect(string serverIP, int serverPort);
         void Disconnect();
         void Send(string message);

@@ -11,6 +11,7 @@ namespace SocketTopic.Services
     public class Client : IClient
     {
         private Socket clientSocket;
+        public bool IsConnected => clientSocket.Connected;
 
         public Client()
         {
