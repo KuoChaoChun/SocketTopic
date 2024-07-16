@@ -23,18 +23,30 @@ namespace ServerForm
         {
             InitializeComponent();
 
+            #region 原本OK
             //Task.Run(() => StartServer());
+            #endregion
 
+            #region task
             IServer server = SocketFactory.CreateServer();
-            Task.Run(() => server.Start()); 
+            server.AfterConnect = SetClientInfo;    //註冊
+            server.Start();
+            #endregion
         }
 
+        private void SetClientInfo(string ip, int port, string msg)
+        {
+            IpTxt.Invoke(new Action(() => IpTxt.Text = ip));
+            PortTxt.Invoke(new Action(() => PortTxt.Text = port.ToString()));
+        }
+
+        #region 原本OK
         private void StartServer()
         {
             try
             {
                 serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8080);
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8081);
                 serverSocket.Bind(endPoint);
                 serverSocket.Listen(10);
 
@@ -56,6 +68,7 @@ namespace ServerForm
                 AppendLog("服务器错误: " + ex.Message);
             }
         }
+        #endregion
 
         private void HandleClient(Socket client)
         {
@@ -81,16 +94,16 @@ namespace ServerForm
 
         private void AppendLog(string message)
         {
-            //ResultTxt.Invoke(new Action(() => ResultTxt.AppendText(message + Environment.NewLine)));
+            ResultTxt.Invoke(new Action(() => ResultTxt.AppendText(message + Environment.NewLine)));
 
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => ResultTxt.AppendText(message + Environment.NewLine)));
-            }
-            else
-            {
-                ResultTxt.AppendText(message + Environment.NewLine);
-            }
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new Action(() => ResultTxt.AppendText(message + Environment.NewLine)));
+            //}
+            //else
+            //{
+            //    ResultTxt.AppendText(message + Environment.NewLine);
+            //}
         }
 
         private void UpdateClientInfo(string clientIP, int clientPort)

@@ -24,6 +24,10 @@ namespace ClientForm
         {
             InitializeComponent();
 
+            IpTxt.Text = "127.0.0.1";
+            PortTxt.Text = "8081";
+            FileNameTxt.Text = "11.txt";
+
             _client = SocketFactory.CreateClient();
         }
 
@@ -45,19 +49,22 @@ namespace ClientForm
             #endregion
         }
 
+        #region task             
         private async Task SendRequest(string serverIP, int serverPort, string fileName)
         {
             try
             {
+                if (_client.IsConnected)
+                {
+                    //_client.Disconnect();
+                    //AppendLog("已断开连接");
+                }
+
                 _client.Connect(serverIP, serverPort);
+                _client.Send(fileName);
+                await ReceiveResponse(_client);
                 AppendLog($"已连接到服务器 {serverIP}:{serverPort}");
 
-                _client.Send(fileName);
-
-                await ReceiveResponse(_client);
-
-                _client.Disconnect();
-                AppendLog("已断开连接");
             }
             catch (Exception ex)
             {
@@ -86,6 +93,7 @@ namespace ClientForm
                 ResultTxt.AppendText(message + Environment.NewLine);
             }
         }
+        #endregion
 
         #region 原始測試OK
         //private async Task StartClient(string serverIP, int serverPort)
@@ -97,7 +105,7 @@ namespace ClientForm
         //        clientSocket.Connect(serverEndPoint);
 
         //        AppendLog("已连接到服务器。");
-                                
+
         //        string dataToSend = "Hello, Server!";
         //        byte[] data = Encoding.UTF8.GetBytes(dataToSend);
         //        clientSocket.Send(data);
