@@ -49,7 +49,7 @@ namespace SocketTopic.Services
             }
         }
 
-        public void ReceiveFile(byte[] buffer, string savePath, string fileName)
+        public void ReceiveFile(byte[] buffer, string fileName, string savePath)
         {
             // 將指定文件存到指定路徑
             string filePath = Path.Combine(savePath, fileName);

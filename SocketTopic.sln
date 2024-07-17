@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientForm", "ClientForm\Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerForm", "ServerForm\ServerForm.csproj", "{160AC40D-1AA1-4098-81A3-675511DB1521}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketTopicTests", "SocketTopicTests\SocketTopicTests.csproj", "{D732C10A-20E7-4B9B-A2B1-776E3F204279}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{160AC40D-1AA1-4098-81A3-675511DB1521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{160AC40D-1AA1-4098-81A3-675511DB1521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{160AC40D-1AA1-4098-81A3-675511DB1521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D732C10A-20E7-4B9B-A2B1-776E3F204279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D732C10A-20E7-4B9B-A2B1-776E3F204279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D732C10A-20E7-4B9B-A2B1-776E3F204279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D732C10A-20E7-4B9B-A2B1-776E3F204279}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
