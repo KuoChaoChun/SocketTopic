@@ -12,8 +12,6 @@ namespace SocketTopic.Services
     public class Client : IClient
     {
         private Socket clientSocket;
-        public bool IsConnected => clientSocket == null ? false : clientSocket.Connected;
-
         public Client()
         {
 
@@ -24,13 +22,11 @@ namespace SocketTopic.Services
             try
             {
                 clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
                 clientSocket.Connect(serverIP, serverPort);
-                Console.WriteLine($"已连接到服务器 {serverIP}:{serverPort}.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("连接服务器错误: " + ex.Message);
+                Console.WriteLine("Exception: {0}" + ex.Message);
             }
         }
 
@@ -49,33 +45,16 @@ namespace SocketTopic.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("发送数据错误: " + ex.Message);
+                Console.WriteLine("Exception: {0}" + ex.Message);
             }
         }
 
-        public string ReceiveFile(byte[] buffer, string savePath, string fileName)
+        public void ReceiveFile(byte[] buffer, string savePath, string fileName)
         {
-            string result = string.Empty;
-            int receivedBytes = clientSocket.Receive(buffer);
-
-            string dataReceived = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-
-            if(!string.IsNullOrEmpty(dataReceived))
-            {
-                // 將指定文件存到指定路徑
-                string filePath = Path.Combine(savePath, fileName);
-                File.WriteAllBytes(filePath, buffer.ToArray());
-
-                result = "Successful";
-            }
-            else
-            {
-                result = "Error";
-            }
-            
-            return result;
+            // 將指定文件存到指定路徑
+            string filePath = Path.Combine(savePath, fileName);
+            File.WriteAllBytes(filePath, buffer.ToArray());
         }
-
 
         public IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
         {

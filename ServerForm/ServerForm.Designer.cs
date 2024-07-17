@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.ResultTxt = new System.Windows.Forms.TextBox();
             this.FileNameTxt = new System.Windows.Forms.TextBox();
             this.PortTxt = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -41,7 +40,6 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.ResultTxt);
             this.groupBox2.Controls.Add(this.FileNameTxt);
             this.groupBox2.Controls.Add(this.PortTxt);
             this.groupBox2.Controls.Add(this.label6);
@@ -55,17 +53,6 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Server";
-            // 
-            // ResultTxt
-            // 
-            this.ResultTxt.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.ResultTxt.Enabled = false;
-            this.ResultTxt.Font = new System.Drawing.Font("Consolas", 12F);
-            this.ResultTxt.Location = new System.Drawing.Point(25, 247);
-            this.ResultTxt.Multiline = true;
-            this.ResultTxt.Name = "ResultTxt";
-            this.ResultTxt.Size = new System.Drawing.Size(383, 140);
-            this.ResultTxt.TabIndex = 19;
             // 
             // FileNameTxt
             // 
@@ -141,7 +128,6 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.TextBox ResultTxt;
         private System.Windows.Forms.TextBox FileNameTxt;
         private System.Windows.Forms.TextBox PortTxt;
         private System.Windows.Forms.Label label6;

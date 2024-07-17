@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Runtime.InteropServices;
+using SocketTopic.Utility;
 
 namespace SocketTopic.Services
 {
@@ -16,7 +17,7 @@ namespace SocketTopic.Services
     {
         private Socket serverSocket;
         private bool isRunning;
-        string baseDirectory = "C:\\Users\\user\\OneDrive\\文件\\學習\\Visual Studio Project\\SocketTopic\\ServerForm\\Files";
+        string baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Files");
 
         public Server()
         {
@@ -36,15 +37,10 @@ namespace SocketTopic.Services
 
                     isRunning = true;
                     ListenForClients();
-
                 }
                 catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
                 {
-                    Console.WriteLine("端口已被占用，请选择其他端口。");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("服务器启动错误: " + ex.Message);
+                    Console.WriteLine("port已被占用，請選擇其他port。");
                 }
             });
         }
@@ -61,41 +57,54 @@ namespace SocketTopic.Services
         {
             while (isRunning)
             {
+                string fileName = string.Empty;
                 Socket client = serverSocket.Accept();
                 IPEndPoint clientEndPoint = (IPEndPoint)client.RemoteEndPoint;
-                Console.WriteLine($"客户端已连接，IP: {clientEndPoint.Address}, 端口: {clientEndPoint.Port}");
+                Console.WriteLine($"Client端已連接，IP: {clientEndPoint.Address}, Port: {clientEndPoint.Port}");
 
-                AfterConnect?.Invoke(clientEndPoint.Address.ToString(), clientEndPoint.Port, string.Empty); //觸發事件
+                fileName = GetClientFile(client);
+                AfterConnect?.Invoke(clientEndPoint.Address.ToString(), clientEndPoint.Port, fileName); //觸發事件
 
-                Task.Run(() => HandleClient(client));
+                Task.Run(() => SendFileExist(client, fileName));
             }
         }
 
-        private void HandleClient(Socket client)
+        private string GetClientFile(Socket client)
+        {
+            byte[] buffer = new byte[1024];
+            int receivedBytes = client.Receive(buffer);
+            string fileName = Encoding.UTF8.GetString(buffer, 0, receivedBytes).Trim();
+
+            return fileName;
+        }
+
+        private void SendFileExist(Socket client, string fileName)
         {
             try
             {
-                byte[] buffer = new byte[1024];
-                int receivedBytes = client.Receive(buffer);
-                string fileName = Encoding.UTF8.GetString(buffer, 0, receivedBytes).Trim();
                 string filePath = Path.Combine(baseDirectory, fileName);
 
-                //bool fileExists = File.Exists(filePath);
-                if (File.Exists(filePath)) 
+                if (File.Exists(filePath))
                 {
+                    byte[] msgResult = Encoding.UTF8.GetBytes(MsgResultType.Success);
+                    client.Send(msgResult);
+
                     byte[] fileBytes = File.ReadAllBytes(filePath);
                     client.Send(fileBytes);
-                }            
+                }
+                else
+                {
+                    byte[] msgResult = Encoding.UTF8.GetBytes(MsgResultType.Error);
+                    client.Send(msgResult);
+                }
 
                 client.Shutdown(SocketShutdown.Both);
                 client.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("处理客户端错误: " + ex.Message);
+                Console.WriteLine("Exception: {0}" + ex.Message);
             }
         }
-
-
     }
 }

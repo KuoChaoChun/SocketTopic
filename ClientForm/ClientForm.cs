@@ -13,14 +13,13 @@ using SocketTopic.Interface;
 using SocketTopic.Factory;
 using SocketTopic.Services;
 using System.IO;
+using SocketTopic.Utility;
 
 namespace ClientForm
 {
     public partial class ClientForm : Form
     {
         private IClient _client;
-        private Socket clientSocket;
-
         public ClientForm()
         {
             InitializeComponent();
@@ -36,7 +35,8 @@ namespace ClientForm
         private void RequestBtn_Click(object sender, EventArgs e)
         {
             string serverIP = IpTxt.Text.Trim();
-            int serverPort = 0;
+            int serverPort = 8081;
+            string fileName = FileNameTxt.Text.Trim();
 
             if (!int.TryParse(PortTxt.Text.Trim(), out serverPort))
             {
@@ -44,21 +44,20 @@ namespace ClientForm
                 return;
             }
 
-            Task.Run(() => SendRequest(serverIP, serverPort, FileNameTxt.Text.Trim()));
+            Task.Run(() => SendRequest(serverIP, serverPort, fileName));
         }
-
-        #region task             
+         
         private async Task SendRequest(string serverIP, int serverPort, string fileName)
         {
             try
             {
                 _client.Connect(serverIP, serverPort);
                 _client.Send(fileName);
-                await ReceiveResponse(_client);                
+                await ReceiveResponse(_client);
             }
             catch (Exception ex)
             {
-                AppendLog("错误: " + ex.Message);
+                AppendLog("Exception: {0}" + ex.Message);
             }
         }
 
@@ -68,11 +67,22 @@ namespace ClientForm
             var receivedBytes = await Task<int>.Factory.FromAsync(
                 client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, null, client),
                 client.EndReceive);
-            string dataReceived = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+            string result = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
-            string result = _client.ReceiveFile(buffer, SavePathTxt.Text, FileNameTxt.Text);
+            AppendLog("檔案讀取：" + result);
 
-            AppendLog("从服务器接收到的数据：" + result);
+            if (result == MsgResultType.Success)
+                await DownloadFile(client);
+        }
+
+        private async Task DownloadFile(IClient client)
+        {
+            var buffer = new byte[1024];
+            var receivedBytes = await Task<int>.Factory.FromAsync(
+                client.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, null, client),
+                client.EndReceive);
+
+            _client.ReceiveFile(buffer, SavePathTxt.Text, FileNameTxt.Text);
         }
 
         private void AppendLog(string message)
@@ -86,6 +96,5 @@ namespace ClientForm
                 ResultTxt.AppendText(message + Environment.NewLine);
             }
         }
-        #endregion
     }
 }

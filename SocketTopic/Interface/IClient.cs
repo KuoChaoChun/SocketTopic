@@ -9,14 +9,11 @@ namespace SocketTopic.Interface
 {
     public interface IClient
     {
-        bool IsConnected { get; }
-
         void Connect(string serverIP, int serverPort);
         void Disconnect();
         void Send(string message);
-        string ReceiveFile(byte[] fileContent, string savePath, string fileName);
+        void ReceiveFile(byte[] fileContent, string savePath, string fileName);
         IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state);
         int EndReceive(IAsyncResult asyncResult);
-
     }
 }
