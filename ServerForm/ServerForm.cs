@@ -10,8 +10,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SocketTopic.Factory;
 using SocketTopic.Interface;
+using SocketTopic.Services;
+using SocketTopic.Apps;
 
 namespace ServerForm
 {
@@ -21,7 +22,8 @@ namespace ServerForm
         {
             InitializeComponent();
 
-            IServer server = SocketFactory.CreateServer();
+            TcpSocketWrapper tcpSocketWrapper = new TcpSocketWrapper();
+            Server server = new Server(tcpSocketWrapper);
             server.AfterConnect = SetClientInfo;    //註冊
             server.Start();
         }

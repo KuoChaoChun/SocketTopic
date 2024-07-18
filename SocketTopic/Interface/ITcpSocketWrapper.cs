@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SocketTopic.Interface
 {
-    public interface IClient
+    public interface ITcpSocketWrapper
     {
-        void Connect(string serverIP, int serverPort);
-        void Disconnect();
+        void Connect(string ip, int port);
+        void Close();
+        void Listen(IPAddress address, int port);
         void Send(string message);
         int Receive(byte[] dateBuffer);
-        void ReceiveFile(byte[] fileContent, string fileName, string savePath);
+        T Accept<T>() where T : class;
     }
 }
+

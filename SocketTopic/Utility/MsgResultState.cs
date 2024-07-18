@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocketTopic.Utility
 {
-    public static class MsgResultType
+    public static class MsgResultState
     {
         public const string Success = nameof(Success);
 

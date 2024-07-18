@@ -6,47 +6,55 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using SocketTopic.Utility;
 
 namespace SocketTopic.Services
 {
     public class Client : IClient
     {
-        private Socket clientSocket;
-        public Client()
-        {
+        private ITcpSocketWrapper _socketWrapper;
+        private string _fileName;
+        private string _savePath;
 
+        public Client(ITcpSocketWrapper socketWrapper, string fileName, string savePath)
+        {
+            _socketWrapper = socketWrapper;
+            _fileName = fileName;
+            _savePath = savePath;
         }
 
         public void Connect(string serverIP, int serverPort)
         {
             try
             {
-                clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                clientSocket.Connect(serverIP, serverPort);
+                _socketWrapper.Connect(serverIP, serverPort);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception: {0}" + ex.Message);
+                Console.WriteLine("Client_Connect()_Exception: {0}" + ex.Message);
             }
         }
 
         public void Disconnect()
         {
-            clientSocket.Close();
-            clientSocket = null;
+            _socketWrapper.Close();
         }
 
         public void Send(string message)
         {
             try
             {
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                clientSocket.Send(data);
+                _socketWrapper.Send(message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception: {0}" + ex.Message);
+                Console.WriteLine("Client_Send()_Exception: {0}" + ex.Message);
             }
+        }
+
+        public int Receive(byte[] dateBuffer)
+        {
+            return _socketWrapper.Receive(dateBuffer);
         }
 
         public void ReceiveFile(byte[] buffer, string fileName, string savePath)
@@ -56,14 +64,40 @@ namespace SocketTopic.Services
             File.WriteAllBytes(filePath, buffer.ToArray());
         }
 
-        public IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
+        public async Task<string> SendRequest(string serverIP, int serverPort, string fileName)
         {
-            return clientSocket.BeginReceive(buffer, offset, size, socketFlags, callback, state);
+            try
+            {
+                _socketWrapper.Connect(serverIP, serverPort);
+                _socketWrapper.Send(fileName);
+                return await ReceiveResponse(_socketWrapper);
+            }
+            catch (Exception ex)
+            {
+                return $"SendRequest()_Exception: {ex.Message}";
+            }
         }
 
-        public int EndReceive(IAsyncResult asyncResult)
+        public async Task<string> ReceiveResponse(ITcpSocketWrapper socketWrapper)
         {
-            return clientSocket.EndReceive(asyncResult);
+            var buffer = new byte[1024];
+            int receivedBytes = socketWrapper.Receive(buffer);
+            string result = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
+            if (result == MsgResultState.Success)
+            {
+                await DownloadFile(socketWrapper);
+            }
+
+            return result;
+        }
+
+        public async Task DownloadFile(ITcpSocketWrapper socketWrapper)
+        {
+            var buffer = new byte[1024];
+            int receivedBytes = socketWrapper.Receive(buffer);
+
+            ReceiveFile(buffer, _fileName, _savePath);
         }
     }
 }

@@ -15,13 +15,14 @@ namespace SocketTopic.Services
 {
     public class Server : IServer
     {
-        private Socket serverSocket;
+        private ITcpSocketWrapper _socketWrapper;
+
         private bool isRunning;
         string baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Files");
 
-        public Server()
+        public Server(ITcpSocketWrapper socketWrapper)
         {
-            serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _socketWrapper = socketWrapper;
             isRunning = false;
         }
 
@@ -31,10 +32,7 @@ namespace SocketTopic.Services
             {
                 try
                 {
-                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8081);
-                    serverSocket.Bind(endPoint);
-                    serverSocket.Listen(10);
-
+                    _socketWrapper.Listen(IPAddress.Any, 8081);                   
                     isRunning = true;
                     ListenForClients();
                 }
@@ -48,7 +46,7 @@ namespace SocketTopic.Services
         public void Stop()
         {
             isRunning = false;
-            serverSocket.Close();
+            _socketWrapper.Close();
         }
 
         public Action<string, int, string> AfterConnect { get; set; }
@@ -58,7 +56,7 @@ namespace SocketTopic.Services
             while (isRunning)
             {
                 string fileName = string.Empty;
-                Socket client = serverSocket.Accept();
+                Socket client = _socketWrapper.Accept<Socket>();
                 IPEndPoint clientEndPoint = (IPEndPoint)client.RemoteEndPoint;
                 Console.WriteLine($"Client端已連接，IP: {clientEndPoint.Address}, Port: {clientEndPoint.Port}");
 
@@ -86,7 +84,7 @@ namespace SocketTopic.Services
 
                 if (File.Exists(filePath))
                 {
-                    byte[] msgResult = Encoding.UTF8.GetBytes(MsgResultType.Success);
+                    byte[] msgResult = Encoding.UTF8.GetBytes(MsgResultState.Success);
                     client.Send(msgResult);
 
                     byte[] fileBytes = File.ReadAllBytes(filePath);
@@ -94,7 +92,7 @@ namespace SocketTopic.Services
                 }
                 else
                 {
-                    byte[] msgResult = Encoding.UTF8.GetBytes(MsgResultType.Error);
+                    byte[] msgResult = Encoding.UTF8.GetBytes(MsgResultState.Error);
                     client.Send(msgResult);
                 }
 
@@ -103,7 +101,7 @@ namespace SocketTopic.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception: {0}" + ex.Message);
+                Console.WriteLine("SendFileExist()_Exception: {0}" + ex.Message);
             }
         }
     }

@@ -10,16 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SocketTopic.Interface;
-using SocketTopic.Factory;
 using SocketTopic.Services;
 using System.IO;
 using SocketTopic.Utility;
+using SocketTopic.Apps;
 
 namespace ClientForm
 {
     public partial class ClientForm : Form
     {
-        private ClientFileService _fileService;
+        private Client _client;
+
         public ClientForm()
         {
             InitializeComponent();
@@ -29,8 +30,8 @@ namespace ClientForm
             FileNameTxt.Text = "Member.txt";
             SavePathTxt.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            var client = SocketFactory.CreateClient();
-            _fileService = new ClientFileService(client, FileNameTxt.Text, SavePathTxt.Text);
+            TcpSocketWrapper tcpSocketWrapper = new TcpSocketWrapper();
+            _client = new Client(tcpSocketWrapper, FileNameTxt.Text, SavePathTxt.Text);
         }
 
         private void RequestBtn_Click(object sender, EventArgs e)
@@ -47,7 +48,7 @@ namespace ClientForm
 
             Task.Run(async () =>
             {
-                string result = await _fileService.SendRequest(serverIP, serverPort, fileName);
+                string result = await _client.SendRequest(serverIP, serverPort, fileName);
                 AppendLog(result);
             });
         }
